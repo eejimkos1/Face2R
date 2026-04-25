@@ -1,9 +1,11 @@
-const CACHE_NAME = 'face2r-v1';
+const CACHE_NAME = 'face2r-v4';
 
 const PRE_CACHE = [
   '/',
   '/index.html',
+  '/admin.html',
   '/css/camera.css',
+  '/css/admin.css',
   '/js/app.js',
   '/js/firebase.js',
   '/js/auth.js',
@@ -11,6 +13,8 @@ const PRE_CACHE = [
   '/js/recognition.js',
   '/js/confidence.js',
   '/js/ui.js',
+  '/js/admin.js',
+  '/js/admin-ui.js',
   '/manifest.json'
 ];
 

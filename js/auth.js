@@ -60,6 +60,12 @@ function showPinScreen() {
     }
   });
 
+  newInput.addEventListener('input', () => {
+    if (newInput.value.length === 4) {
+      handlePinSubmit();
+    }
+  });
+
   newSubmitBtn.addEventListener('click', () => {
     handlePinSubmit();
   });

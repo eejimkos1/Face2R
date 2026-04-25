@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="description" content="Face2R Admin Panel — manage persons and photos">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Face2R Admin</title>
+</head>
+<body>
+
+  <!-- ========== PIN Screen ========== -->
+  <div id="pin-screen">
+    <div class="pin-title">Face2R Admin</div>
+    <input
+      type="password"
+      class="pin-input"
+      maxlength="4"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      placeholder="----"
+      autocomplete="off"
+    >
+    <button class="pin-submit" type="button">Unlock</button>
+    <div class="pin-error"></div>
+  </div>
+
+  <!-- ========== Loading Screen ========== -->
+  <div id="loading-screen" style="display:none">
+    <div class="loading-status">Connecting...</div>
+  </div>
+
+  <!-- ========== Person List View ========== -->
+  <div id="view-list" style="display:none">
+    <!-- Top bar -->
+    <div class="admin-top-bar">
+      <span class="admin-title">Face2R Admin</span>
+      <div class="admin-top-right">
+        <span id="admin-person-count">0 persons</span>
+        <span class="sync-dot" id="admin-sync-dot"></span>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <input type="text" id="search-input" placeholder="Search persons..." autocomplete="off">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all" type="button">All</button>
+        <button class="filter-btn" data-filter="red" type="button">Risk</button>
+        <button class="filter-btn" data-filter="neutral" type="button">Neutral</button>
+        <button class="filter-btn" data-filter="green" type="button">Low</button>
+      </div>
+    </div>
+
+    <!-- Person list container -->
+    <div id="person-list"></div>
+
+    <!-- Footer -->
+    <div class="admin-footer">
+      <button id="btn-change-pin" type="button">Change PIN</button>
+      <button id="btn-add-person" type="button">+ Add Person</button>
+      <a href="index.html" class="footer-link">Back to Camera</a>
+    </div>
+  </div>
+
+  <!-- ========== Edit Person View ========== -->
+  <div id="view-edit" style="display:none">
+    <div class="view-header">
+      <button id="btn-edit-back" type="button" aria-label="Back">&larr;</button>
+      <span id="edit-title">Edit Person</span>
+      <span id="edit-badge"></span>
+    </div>
+
+    <div class="view-body">
+      <!-- Photos section -->
+      <div class="section-label">PHOTOS (<span id="edit-photo-count">0</span>)</div>
+      <div id="edit-photo-grid" class="photo-grid"></div>
+
+      <!-- Confidence section -->
+      <div class="section-label">CONFIDENCE</div>
+      <div class="confidence-section">
+        <div class="confidence-bar"><div class="confidence-bar-fill" id="edit-conf-fill"></div></div>
+        <div class="confidence-info">
+          <span id="edit-conf-pct"></span>
+          <span id="edit-conf-rec"></span>
+        </div>
+      </div>
+
+      <!-- Form fields -->
+      <div class="section-label">NAME</div>
+      <input type="text" id="edit-name" placeholder="Enter name" autocomplete="off">
+
+      <div class="section-label">RISK LEVEL</div>
+      <div class="risk-selector">
+        <button class="risk-btn" data-risk="green" type="button">LOW</button>
+        <button class="risk-btn" data-risk="neutral" type="button">NEUTRAL</button>
+        <button class="risk-btn" data-risk="red" type="button">RISK</button>
+      </div>
+
+      <div class="section-label">NOTES</div>
+      <textarea id="edit-notes" placeholder="Notes (optional)"></textarea>
+
+      <!-- Metadata -->
+      <div class="metadata" id="edit-metadata"></div>
+
+      <!-- Actions -->
+      <button class="btn-primary" id="btn-save-edit" type="button">Save Changes</button>
+      <button class="btn-danger" id="btn-delete-person" type="button">Delete Person</button>
+    </div>
+  </div>
+
+  <!-- ========== Add Person View ========== -->
+  <div id="view-add" style="display:none">
+    <div class="view-header">
+      <button id="btn-add-back" type="button" aria-label="Back">&larr;</button>
+      <span>Add Person</span>
+    </div>
+
+    <div class="view-body">
+      <!-- Photos section -->
+      <div class="section-label">PHOTOS (<span id="add-photo-count">0</span>)</div>
+      <div id="add-photo-grid" class="photo-grid"></div>
+
+      <!-- Confidence section -->
+      <div class="section-label">CONFIDENCE</div>
+      <div class="confidence-section">
+        <div class="confidence-bar"><div class="confidence-bar-fill" id="add-conf-fill"></div></div>
+        <div class="confidence-info">
+          <span id="add-conf-pct"></span>
+          <span id="add-conf-rec"></span>
+        </div>
+      </div>
+
+      <!-- Form fields -->
+      <div class="section-label">NAME</div>
+      <input type="text" id="add-name" placeholder="Enter name" autocomplete="off">
+
+      <div class="section-label">RISK LEVEL</div>
+      <div class="risk-selector" id="add-risk-selector">
+        <button class="risk-btn" data-risk="green" type="button">LOW</button>
+        <button class="risk-btn selected" data-risk="neutral" type="button">NEUTRAL</button>
+        <button class="risk-btn" data-risk="red" type="button">RISK</button>
+      </div>
+
+      <div class="section-label">NOTES</div>
+      <textarea id="add-notes" placeholder="Notes (optional)"></textarea>
+
+      <!-- Actions -->
+      <button class="btn-primary" id="btn-save-add" type="button" disabled>Save Person</button>
+    </div>
+  </div>
+
+  <!-- ========== Change PIN View ========== -->
+  <div id="view-pin" style="display:none">
+    <div class="view-header">
+      <button id="btn-pin-back" type="button" aria-label="Back">&larr;</button>
+      <span>Change PIN</span>
+    </div>
+
+    <div class="view-body">
+      <div class="section-label">CURRENT PIN</div>
+      <input type="password" id="pin-current" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="----" autocomplete="off">
+
+      <div class="section-label">NEW PIN</div>
+      <input type="password" id="pin-new" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="----" autocomplete="off">
+
+      <div class="section-label">CONFIRM NEW PIN</div>
+      <input type="password" id="pin-confirm" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="----" autocomplete="off">
+
+      <button class="btn-primary" id="btn-change-pin-submit" type="button">Change PIN</button>
+      <div class="pin-change-error" id="pin-change-error"></div>
+    </div>
+  </div>
+
+  <!-- ========== Delete Confirmation Modal ========== -->
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title" id="delete-modal-title">Delete person?</div>
+      <div class="modal-text">This will permanently delete this person and all their photos. This cannot be undone.</div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-delete-cancel" type="button">Cancel</button>
+        <button class="btn-danger" id="btn-delete-confirm" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Delete Photo Confirmation Modal ========== -->
+  <div id="delete-photo-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title">Delete this photo?</div>
+      <div class="modal-text">This photo and its embedding data will be permanently removed.</div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-photo-delete-cancel" type="button">Cancel</button>
+        <button class="btn-danger" id="btn-photo-delete-confirm" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Hidden file input for photo upload ========== -->
+  <input type="file" id="photo-file-input" accept="image/*" multiple style="display:none">
+
+  <!-- ========== Toast ========== -->
+  <div id="toast"></div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
